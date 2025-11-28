@@ -1,19 +1,33 @@
-FROM nvidia/cuda:11.7.1-runtime-ubuntu20.04
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     libsm6 libxext6 ffmpeg libfontconfig1 libxrender1 libgl1-mesa-glx \
-    curl python3-pip
+    curl python3-pip python3-dev git gcc build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==2.1.0 torchvision==0.16.0 --index-url https://download.pytorch.org/whl/cu118
-RUN pip3 install xformers==0.0.22.post4 --index-url https://download.pytorch.org/whl/cu118
 
-ARG version 
+# 安装最新的 PyTorch（CUDA 12.1）
+RUN pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
-RUN pip3 install lama-cleaner==$version
-RUN lama-cleaner --install-plugins-package
+WORKDIR /app
+
+# 复制项目文件
+COPY requirements.txt requirements-dev.txt setup.py main.py ./
+COPY iopaint ./iopaint
+COPY web_app ./web_app
+
+# 安装依赖
+RUN pip3 install -r requirements.txt && \
+    pip3 install -e .
+
+# 安装插件依赖
+RUN iopaint install-plugins-packages || true
 
 EXPOSE 8080
 
-CMD ["bash"]
+# 默认启动命令（GPU 模式）
+CMD ["python3", "main.py", "start", "--model", "lama", "--device", "cuda", "--port", "8080", "--host", "0.0.0.0"]

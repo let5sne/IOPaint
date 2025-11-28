@@ -3,10 +3,10 @@
 
 set -e
 
-# Ensuer not use user's python package
+# Ensure not use user's python package
 export PYTHONNOUSERSITE=1
 
-BUILD_DIST=lama-cleaner
+BUILD_DIST=iopaint
 BUILD_ENV=installer
 USER_SCRIPTS=user_scripts
 
