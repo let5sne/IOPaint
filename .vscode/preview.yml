@@ -1,0 +1,34 @@
+# IOPaint Preview Configuration
+autoOpen: true # 打开工作空间时是否自动开启所有应用的预览
+apps:
+  - port: 8080 # IOPaint 服务器端口
+    run: python3 main.py start --model lama --device cuda --port 8080 # 启动命令（使用 LaMa 模型和 GPU）
+    root: . # 应用的启动目录（项目根目录）
+    name: IOPaint - LaMa Model # 应用名称
+    description: IOPaint 图像修复工具 - 使用 LaMa 模型快速擦除（GPU 加速） # 应用描述
+    autoOpen: true # 打开工作空间时是否自动运行命令
+    autoPreview: true # 自动打开预览
+
+  - port: 8080 # IOPaint 服务器端口
+    run: python3 main.py start --model runwayml/stable-diffusion-inpainting --device cuda --port 8080 # SD Inpainting 模型
+    root: . # 应用的启动目录
+    name: IOPaint - SD Inpainting # 应用名称
+    description: IOPaint 图像修复工具 - 使用 Stable Diffusion Inpainting（支持文本提示） # 应用描述
+    autoOpen: false # 不自动运行（手动切换）
+    autoPreview: false # 不自动预览
+
+  - port: 8080 # IOPaint 服务器端口
+    run: python3 main.py start --model diffusers/stable-diffusion-xl-1.0-inpainting-0.1 --device cuda --low-mem --port 8080 # SDXL 模型
+    root: . # 应用的启动目录
+    name: IOPaint - SDXL Inpainting # 应用名称
+    description: IOPaint 图像修复工具 - 使用 SDXL（高质量，低内存模式） # 应用描述
+    autoOpen: false # 不自动运行（手动切换）
+    autoPreview: false # 不自动预览
+
+  - port: 8080 # IOPaint 服务器端口
+    run: python3 main.py start --model lama --device cpu --port 8080 # CPU 模式
+    root: . # 应用的启动目录
+    name: IOPaint - LaMa (CPU) # 应用名称
+    description: IOPaint 图像修复工具 - LaMa 模型 CPU 模式（无需 GPU） # 应用描述
+    autoOpen: false # 不自动运行（手动切换）
+    autoPreview: false # 不自动预览

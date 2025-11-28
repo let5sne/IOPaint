@@ -105,6 +105,85 @@ When `--mask` is a path to a mask file, all images will be processed using this 
 
 You can see more information about the available models and plugins supported by IOPaint below.
 
+## Model Recommendations
+
+Choosing the right model depends on your use case and hardware. Here's our recommended model strategy:
+
+### 🚀 Quick Start - For Daily Use
+
+**LaMa (Recommended for beginners)**
+```bash
+iopaint start --model lama --device cuda --port 8080
+```
+- ⚡ **Fastest** - Near real-time processing
+- 💾 **Low VRAM** - Uses ~1GB GPU memory
+- 🎯 **Best for**: Removing watermarks, people, objects from images
+- ✅ **Most stable** and reliable
+
+### 🎨 Creative Editing - With Prompt Control
+
+**Stable Diffusion Inpainting**
+```bash
+iopaint start --model runwayml/stable-diffusion-inpainting --device cuda --port 8080
+```
+- 🎨 **Smart content generation** - Not just removal, but intelligent filling
+- 📝 **Text prompts** - Control what gets generated
+- 🖼️ **Creative flexibility** - Replace objects with AI-generated content
+- ✅ **Official model** - Well-maintained and stable
+
+### 💎 Professional - High Quality Results
+
+**SDXL Inpainting (For high-resolution work)**
+```bash
+iopaint start --model diffusers/stable-diffusion-xl-1.0-inpainting-0.1 --device cuda --low-mem --port 8080
+```
+- 🖼️ **High resolution** - Supports up to 1024x1024
+- 🎨 **Better details** - Superior quality output
+- 💎 **Professional use** - Best for photography and commercial work
+- ⚠️ **Requires more VRAM** - Use `--low-mem` flag for optimization
+
+### 📊 Model Comparison
+
+| Model | Speed | Quality | VRAM | Use Case | Recommended |
+|-------|-------|---------|------|----------|-------------|
+| **LaMa** | ⚡⚡⚡⚡⚡ | ⭐⭐⭐⭐ | ~1GB | Quick erase | ⭐⭐⭐⭐⭐ |
+| **SD Inpainting** | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | ~4GB | Creative edit | ⭐⭐⭐⭐⭐ |
+| **SDXL Inpainting** | ⚡⚡ | ⭐⭐⭐⭐⭐ | ~8GB | Professional | ⭐⭐⭐⭐ |
+| **PowerPaint V2** | ⚡⚡⚡ | ⭐⭐⭐⭐ | ~5GB | Multi-task | ⭐⭐⭐⭐ |
+
+### 🔧 GPU Optimization Tips
+
+For NVIDIA GPUs with limited VRAM:
+```bash
+# Enable low memory mode
+iopaint start --model <model_name> --device cuda --low-mem --port 8080
+
+# Enable CPU offload for very large models
+iopaint start --model <model_name> --device cuda --cpu-offload --port 8080
+```
+
+For CPU-only systems:
+```bash
+# LaMa works well on CPU
+iopaint start --model lama --device cpu --port 8080
+```
+
+### 📦 Installation Note
+
+**Updated Dependencies (2025-11-28)**
+
+This project now uses the latest stable versions of all dependencies. Install with:
+
+```bash
+# Recommended: Use mirror for faster installation (China users)
+pip3 install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
+# Or use official PyPI
+pip3 install -r requirements.txt
+```
+
+See `UPGRADE_NOTES.md` for detailed information about package updates.
+
 ## Development
 
 Install [nodejs](https://nodejs.org/en), then install the frontend dependencies.
