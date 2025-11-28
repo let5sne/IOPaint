@@ -205,16 +205,16 @@ git commit -m "sync: 同步工具函数优化"
 ## 🚀 快速链接
 
 ### 文档
-- [📑 文档导航](../API_DOCS_INDEX.md)
-- [🚀 快速开始](../API_SERVICE_README.md)
-- [📖 REST API 文档](../RESTFUL_API_DOCUMENTATION.md)
-- [💻 客户端示例](../API_CLIENT_EXAMPLES.md)
-- [🏗️ 部署方案](../API_SERVICE_GUIDE.md)
-- [🌿 分支说明](../BRANCH_README.md)
+- [📑 文档导航](./API_DOCS_INDEX.md)
+- [🚀 快速开始](./API_SERVICE_README.md)
+- [📖 REST API 文档](./RESTFUL_API_DOCUMENTATION.md)
+- [💻 客户端示例](./API_CLIENT_EXAMPLES.md)
+- [🏗️ 部署方案](./API_SERVICE_GUIDE.md)
+- [🌿 分支说明](./BRANCH_README.md)
 
 ### 配置文件
-- [OpenAPI 规范](../openapi.yaml)
-- [Postman Collection](../IOPaint_API.postman_collection.json)
+- [OpenAPI 规范](./openapi.yaml)
+- [Postman Collection](./IOPaint_API.postman_collection.json)
 - [Docker Compose](../docker-compose.mvp.yml)
 - [Nginx 配置](../nginx/nginx.conf)
 

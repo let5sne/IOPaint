@@ -5,14 +5,14 @@
 >
 > This branch provides a **production-ready REST API service** for watermark removal and inpainting.
 >
-> - 🚀 **Quick Start**: See [API_SERVICE_README.md](./API_SERVICE_README.md)
-> - 📖 **API Documentation**: See [RESTFUL_API_DOCUMENTATION.md](./RESTFUL_API_DOCUMENTATION.md)
-> - 🏗️ **Deployment Guide**: See [API_SERVICE_GUIDE.md](./API_SERVICE_GUIDE.md)
-> - 📑 **All Docs**: See [API_DOCS_INDEX.md](./API_DOCS_INDEX.md)
+> - 🚀 **Quick Start**: See [API_SERVICE_README.md](./docs/API_SERVICE_README.md)
+> - 📖 **API Documentation**: See [RESTFUL_API_DOCUMENTATION.md](./docs/RESTFUL_API_DOCUMENTATION.md)
+> - 🏗️ **Deployment Guide**: See [API_SERVICE_GUIDE.md](./docs/API_SERVICE_GUIDE.md)
+> - 📑 **All Docs**: See [API_DOCS_INDEX.md](./docs/API_DOCS_INDEX.md)
 >
 > **Looking for the WebUI version?** Switch to [main branch](https://github.com/let5sne/IOPaint/tree/main)
 >
-> **Branch Comparison**: See [BRANCH_README.md](./BRANCH_README.md)
+> **Branch Comparison**: See [BRANCH_README.md](./docs/BRANCH_README.md)
 
 <p align="center">
   <a href="https://github.com/Sanster/IOPaint">
