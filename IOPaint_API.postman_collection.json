@@ -1,0 +1,461 @@
+{
+  "info": {
+    "name": "IOPaint Watermark Removal API",
+    "description": "AI-powered watermark removal service using LaMa model.\n\n## Quick Start\n\n1. Set your API key in the collection variables\n2. Import sample images for testing\n3. Run requests\n\n## Authentication\n\nAll endpoints (except health check) require an API key in the `X-API-Key` header.\n\nGet your API key from: https://iopaint.com/dashboard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "your_secret_key_change_me",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Processing",
+      "item": [
+        {
+          "name": "Remove Watermark",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test response status",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test content type",
+                  "pm.test(\"Content-Type is image/png\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\", \"image/png\");",
+                  "});",
+                  "",
+                  "// Test processing time header exists",
+                  "pm.test(\"Has X-Processing-Time header\", function () {",
+                  "    pm.response.to.have.header(\"X-Processing-Time\");",
+                  "});",
+                  "",
+                  "// Test image size header exists",
+                  "pm.test(\"Has X-Image-Size header\", function () {",
+                  "    pm.response.to.have.header(\"X-Image-Size\");",
+                  "});",
+                  "",
+                  "// Log processing time",
+                  "const processingTime = pm.response.headers.get(\"X-Processing-Time\");",
+                  "const imageSize = pm.response.headers.get(\"X-Image-Size\");",
+                  "console.log(`Processing time: ${processingTime}s`);",
+                  "console.log(`Image size: ${imageSize}`);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "description": "Image file to process (JPEG, PNG, WebP)",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "mask",
+                  "description": "Optional mask (white = remove, black = keep)",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/remove-watermark",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "remove-watermark"]
+            },
+            "description": "Remove watermarks or unwanted objects from images.\n\n### Request\n- **image** (required): Image file to process\n- **mask** (optional): Mask image (white areas will be removed)\n\n### Response\n- Returns processed image as PNG\n- Headers include processing time and image size\n\n### Example\n```bash\ncurl -X POST http://localhost:8080/api/v1/remove-watermark \\\n  -H \"X-API-Key: your_key\" \\\n  -F \"image=@test.jpg\" \\\n  -o result.png\n```"
+          },
+          "response": [
+            {
+              "name": "Success - Image Processed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": "/path/to/image.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/remove-watermark",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "remove-watermark"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "png",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "image/png"
+                },
+                {
+                  "key": "X-Processing-Time",
+                  "value": "1.52"
+                },
+                {
+                  "key": "X-Image-Size",
+                  "value": "1024x768"
+                }
+              ],
+              "body": "<binary PNG data>"
+            },
+            {
+              "name": "Error - Invalid API Key",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "invalid_key"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/remove-watermark",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "remove-watermark"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Unauthorized\",\n  \"detail\": \"Invalid API Key\",\n  \"status_code\": 401\n}"
+            },
+            {
+              "name": "Error - Image Too Large",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/remove-watermark",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "remove-watermark"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Bad Request\",\n  \"detail\": \"Image too large. Max dimension: 4096px\",\n  \"status_code\": 400\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Watermark (With Mask)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is image/png\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\", \"image/png\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "description": "Original image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "mask",
+                  "description": "Mask image (white = remove, black = keep)",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/remove-watermark",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "remove-watermark"]
+            },
+            "description": "Remove watermarks with a custom mask for precise control.\n\n### Mask Guidelines\n- **White (255)**: Areas to remove/inpaint\n- **Black (0)**: Areas to preserve\n- **Gray**: Partial inpainting (blend)\n\n### Creating Masks\n- Use any image editor (Photoshop, GIMP, etc.)\n- Paint white over watermark areas\n- Save as PNG\n- Mask will be auto-resized to match image dimensions"
+          },
+          "response": []
+        }
+      ],
+      "description": "Image processing endpoints"
+    },
+    {
+      "name": "Monitoring",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has status field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "});",
+                  "",
+                  "pm.test(\"Service is healthy\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('healthy');",
+                  "});",
+                  "",
+                  "// Log service info",
+                  "var jsonData = pm.response.json();",
+                  "console.log(`Model: ${jsonData.model}`);",
+                  "console.log(`Device: ${jsonData.device}`);",
+                  "console.log(`GPU Available: ${jsonData.gpu_available}`);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health"]
+            },
+            "description": "Check API service status and availability.\n\n### No Authentication Required\n\n### Response Fields\n- **status**: Service status (`healthy` or `unhealthy`)\n- **model**: Current AI model name\n- **device**: Compute device (`cuda` or `cpu`)\n- **gpu_available**: GPU availability\n\n### Example\n```bash\ncurl http://localhost:8080/api/v1/health\n```"
+          },
+          "response": [
+            {
+              "name": "Success - Service Healthy",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"healthy\",\n  \"model\": \"lama\",\n  \"device\": \"cuda\",\n  \"gpu_available\": true\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Service monitoring and health checks",
+      "auth": {
+        "type": "noauth"
+      }
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Get Usage Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData).to.have.property('failed');",
+                  "    pm.expect(jsonData).to.have.property('avg_processing_time');",
+                  "});",
+                  "",
+                  "// Calculate and log success rate",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.total > 0) {",
+                  "    var successRate = (jsonData.success / jsonData.total * 100).toFixed(2);",
+                  "    console.log(`Success Rate: ${successRate}%`);",
+                  "    console.log(`Average Processing Time: ${jsonData.avg_processing_time}s`);",
+                  "    console.log(`Total Requests: ${jsonData.total}`);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "stats"]
+            },
+            "description": "Get account usage statistics.\n\n### Authentication Required\nRequires `X-API-Key` header.\n\n### Response Fields\n- **total**: Total requests made\n- **success**: Successful requests\n- **failed**: Failed requests\n- **total_processing_time**: Cumulative processing time (seconds)\n- **avg_processing_time**: Average processing time (seconds)\n\n### Example\n```bash\ncurl http://localhost:8080/api/v1/stats \\\n  -H \"X-API-Key: your_key\"\n```"
+          },
+          "response": [
+            {
+              "name": "Success - Usage Stats",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/stats",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total\": 1250,\n  \"success\": 1230,\n  \"failed\": 20,\n  \"total_processing_time\": 1845.5,\n  \"avg_processing_time\": 1.5\n}"
+            },
+            {
+              "name": "Error - Metrics Disabled",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{api_key}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/stats",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "stats"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Not Found\",\n  \"detail\": \"Metrics disabled\",\n  \"status_code\": 404\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Account and usage information"
+    }
+  ]
+}

@@ -1,0 +1,496 @@
+openapi: 3.0.3
+info:
+  title: IOPaint Watermark Removal API
+  version: 1.0.0
+  description: |
+    AI-powered watermark removal service using state-of-the-art LaMa model.
+
+    ## Features
+    - Fast processing (1-2s for 1024x1024 images)
+    - High-quality results
+    - Optional mask support
+    - Simple REST API
+
+    ## Authentication
+    All endpoints (except health check) require an API key passed via `X-API-Key` header.
+
+  contact:
+    name: IOPaint Support
+    email: support@iopaint.com
+    url: https://iopaint.com/support
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.iopaint.com
+    description: Production server
+  - url: http://localhost:8080
+    description: Development server
+
+tags:
+  - name: Processing
+    description: Image processing operations
+  - name: Monitoring
+    description: Service monitoring and health checks
+  - name: Account
+    description: Account and usage information
+
+paths:
+  /api/v1/remove-watermark:
+    post:
+      tags:
+        - Processing
+      summary: Remove watermark from image
+      description: |
+        Remove watermarks or unwanted objects from images using AI.
+
+        ### Processing Details
+        - Model: LaMa (Large Mask Inpainting)
+        - Processing time: 1-2 seconds for 1024x1024 images
+        - Max image size: 4096px (width or height)
+        - Max file size: 10MB
+
+        ### Mask Usage
+        - White (255): Areas to remove
+        - Black (0): Areas to preserve
+        - Gray: Partial inpainting
+      operationId: removeWatermark
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to process (JPEG, PNG, WebP)
+                mask:
+                  type: string
+                  format: binary
+                  description: Optional mask (white = remove, black = keep)
+            encoding:
+              image:
+                contentType: image/jpeg, image/png, image/webp
+              mask:
+                contentType: image/png
+      responses:
+        '200':
+          description: Successfully processed image
+          headers:
+            X-Processing-Time:
+              description: Processing time in seconds
+              schema:
+                type: number
+                format: float
+                example: 1.52
+            X-Image-Size:
+              description: Original image dimensions
+              schema:
+                type: string
+                example: "1024x768"
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request (invalid image, size exceeded, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidFormat:
+                  summary: Invalid image format
+                  value:
+                    error: "Bad Request"
+                    detail: "Invalid image format: cannot identify image file"
+                    status_code: 400
+                tooLarge:
+                  summary: Image too large
+                  value:
+                    error: "Bad Request"
+                    detail: "Image too large. Max dimension: 4096px"
+                    status_code: 400
+                fileTooLarge:
+                  summary: File size exceeded
+                  value:
+                    error: "Bad Request"
+                    detail: "Image too large. Max size: 10MB"
+                    status_code: 400
+        '401':
+          description: Unauthorized (missing or invalid API key)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingKey:
+                  summary: Missing API key
+                  value:
+                    error: "Unauthorized"
+                    detail: "Missing API Key. Please provide X-API-Key header."
+                    status_code: 401
+                invalidKey:
+                  summary: Invalid API key
+                  value:
+                    error: "Unauthorized"
+                    detail: "Invalid API Key"
+                    status_code: 401
+        '413':
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            X-RateLimit-Limit:
+              description: Maximum requests per time window
+              schema:
+                type: integer
+                example: 10
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window
+              schema:
+                type: integer
+                example: 0
+            X-RateLimit-Reset:
+              description: Unix timestamp when limit resets
+              schema:
+                type: integer
+                format: int64
+                example: 1672531200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Too Many Requests"
+                detail: "Rate limit exceeded. Please try again later."
+                status_code: 429
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Internal Server Error"
+                detail: "Processing failed: CUDA out of memory"
+                status_code: 500
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/health:
+    get:
+      tags:
+        - Monitoring
+      summary: Health check
+      description: Check API service status and availability
+      operationId: healthCheck
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "healthy"
+                model: "lama"
+                device: "cuda"
+                gpu_available: true
+
+  /api/v1/stats:
+    get:
+      tags:
+        - Account
+      summary: Get usage statistics
+      description: Retrieve account usage statistics including request counts and processing times
+      operationId: getStats
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+              example:
+                total: 1250
+                success: 1230
+                failed: 20
+                total_processing_time: 1845.5
+                avg_processing_time: 1.5
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Metrics disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Not Found"
+                detail: "Metrics disabled"
+                status_code: 404
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key for authentication. Obtain from your dashboard at https://iopaint.com/dashboard
+
+        Example: `X-API-Key: sk_live_1234567890abcdef`
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+        - detail
+        - status_code
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "Bad Request"
+        detail:
+          type: string
+          description: Human-readable error message
+          example: "Invalid image format"
+        status_code:
+          type: integer
+          description: HTTP status code
+          example: 400
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - model
+        - device
+        - gpu_available
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          description: Service status
+          example: "healthy"
+        model:
+          type: string
+          description: Current AI model name
+          example: "lama"
+        device:
+          type: string
+          enum: [cuda, cpu]
+          description: Compute device
+          example: "cuda"
+        gpu_available:
+          type: boolean
+          description: GPU availability
+          example: true
+
+    StatsResponse:
+      type: object
+      required:
+        - total
+        - success
+        - failed
+        - total_processing_time
+        - avg_processing_time
+      properties:
+        total:
+          type: integer
+          description: Total requests made
+          example: 1250
+          minimum: 0
+        success:
+          type: integer
+          description: Successful requests
+          example: 1230
+          minimum: 0
+        failed:
+          type: integer
+          description: Failed requests
+          example: 20
+          minimum: 0
+        total_processing_time:
+          type: number
+          format: float
+          description: Cumulative processing time in seconds
+          example: 1845.5
+          minimum: 0
+        avg_processing_time:
+          type: number
+          format: float
+          description: Average processing time in seconds
+          example: 1.5
+          minimum: 0
+
+  examples:
+    SuccessfulProcessing:
+      summary: Successful watermark removal
+      description: Image processed successfully with processing time
+      value:
+        # Binary PNG data returned
+        # Headers: X-Processing-Time: 1.52, X-Image-Size: 1024x768
+
+    InvalidApiKey:
+      summary: Invalid API key provided
+      value:
+        error: "Unauthorized"
+        detail: "Invalid API Key"
+        status_code: 401
+
+    RateLimitExceeded:
+      summary: Rate limit exceeded
+      value:
+        error: "Too Many Requests"
+        detail: "Rate limit exceeded. Please try again later."
+        status_code: 429
+
+x-rate-limits:
+  - name: Free Plan
+    limit: 2
+    period: minute
+    burst: 5
+    quota: 10/day
+  - name: Basic Plan
+    limit: 10
+    period: minute
+    burst: 20
+    quota: 3000/month
+  - name: Pro Plan
+    limit: 30
+    period: minute
+    burst: 60
+    quota: 20000/month
+  - name: Enterprise Plan
+    limit: custom
+    period: custom
+    burst: custom
+    quota: custom
+
+x-code-samples:
+  - lang: cURL
+    label: cURL
+    source: |
+      curl -X POST https://api.iopaint.com/api/v1/remove-watermark \
+        -H "X-API-Key: $IOPAINT_API_KEY" \
+        -F "image=@image.jpg" \
+        -o result.png
+
+  - lang: Python
+    label: Python
+    source: |
+      import requests
+
+      url = "https://api.iopaint.com/api/v1/remove-watermark"
+      headers = {"X-API-Key": "your_api_key"}
+
+      with open("image.jpg", "rb") as f:
+          response = requests.post(url, headers=headers, files={"image": f})
+
+      if response.status_code == 200:
+          with open("result.png", "wb") as f:
+              f.write(response.content)
+
+  - lang: JavaScript
+    label: JavaScript/Node.js
+    source: |
+      const FormData = require('form-data');
+      const fs = require('fs');
+      const axios = require('axios');
+
+      const form = new FormData();
+      form.append('image', fs.createReadStream('image.jpg'));
+
+      axios.post('https://api.iopaint.com/api/v1/remove-watermark', form, {
+          headers: {
+              'X-API-Key': process.env.IOPAINT_API_KEY,
+              ...form.getHeaders()
+          },
+          responseType: 'arraybuffer'
+      })
+      .then(response => {
+          fs.writeFileSync('result.png', response.data);
+      });
+
+  - lang: PHP
+    label: PHP
+    source: |
+      <?php
+      $ch = curl_init('https://api.iopaint.com/api/v1/remove-watermark');
+
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, [
+          'image' => new CURLFile('image.jpg')
+      ]);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+          'X-API-Key: your_api_key'
+      ]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+      $result = curl_exec($ch);
+      file_put_contents('result.png', $result);
+      curl_close($ch);
+      ?>
+
+  - lang: Go
+    label: Go
+    source: |
+      package main
+
+      import (
+          "bytes"
+          "io"
+          "mime/multipart"
+          "net/http"
+          "os"
+      )
+
+      func main() {
+          body := &bytes.Buffer{}
+          writer := multipart.NewWriter(body)
+
+          file, _ := os.Open("image.jpg")
+          defer file.Close()
+          part, _ := writer.CreateFormFile("image", "image.jpg")
+          io.Copy(part, file)
+          writer.Close()
+
+          req, _ := http.NewRequest("POST", "https://api.iopaint.com/api/v1/remove-watermark", body)
+          req.Header.Set("X-API-Key", os.Getenv("IOPAINT_API_KEY"))
+          req.Header.Set("Content-Type", writer.FormDataContentType())
+
+          client := &http.Client{}
+          resp, _ := client.Do(req)
+          defer resp.Body.Close()
+
+          out, _ := os.Create("result.png")
+          defer out.Close()
+          io.Copy(out, resp.Body)
+      }
