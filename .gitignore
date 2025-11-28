@@ -1,0 +1,52 @@
+# macOS
+.DS_Store
+
+# Python
+**/__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+IOPaint.egg-info/
+.pytest_cache/
+.coverage
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+build/
+!iopaint/app/build
+dist/
+tmp/
+
+# Frontend
+iopaint/web_app/
+web_app/node_modules/
+web_app/dist/
+web_app/.env.local
+
+# Examples
+examples/
+example/
+
+# Model cache (optional - uncomment if you don't want to commit models)
+# .cache/
+# *.pt
+# *.ckpt
+# *.safetensors
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
