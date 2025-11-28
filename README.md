@@ -1,6 +1,19 @@
 <h1 align="center">IOPaint</h1>
 <p align="center">A free and open-source inpainting & outpainting tool powered by SOTA AI model.</p>
 
+> **📌 You are viewing the API Service branch**
+>
+> This branch provides a **production-ready REST API service** for watermark removal and inpainting.
+>
+> - 🚀 **Quick Start**: See [API_SERVICE_README.md](./API_SERVICE_README.md)
+> - 📖 **API Documentation**: See [RESTFUL_API_DOCUMENTATION.md](./RESTFUL_API_DOCUMENTATION.md)
+> - 🏗️ **Deployment Guide**: See [API_SERVICE_GUIDE.md](./API_SERVICE_GUIDE.md)
+> - 📑 **All Docs**: See [API_DOCS_INDEX.md](./API_DOCS_INDEX.md)
+>
+> **Looking for the WebUI version?** Switch to [main branch](https://github.com/let5sne/IOPaint/tree/main)
+>
+> **Branch Comparison**: See [BRANCH_README.md](./BRANCH_README.md)
+
 <p align="center">
   <a href="https://github.com/Sanster/IOPaint">
     <img alt="total download" src="https://pepy.tech/badge/iopaint" />
