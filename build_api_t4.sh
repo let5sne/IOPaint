@@ -6,7 +6,7 @@
 set -e
 
 VERSION=${1:-latest}
-IMAGE_NAME="let5sne/iopaint"
+IMAGE_NAME="let5see/iopaint"
 TAG="api-t4-${VERSION}"
 
 echo "=========================================="
